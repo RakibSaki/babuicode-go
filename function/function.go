@@ -1,6 +1,6 @@
 package function
 
-import "babuicode/grammar"
+import "babuicode/elements"
 
 type Declaration struct {
 	Sequence []string
@@ -17,5 +17,5 @@ type Syntax struct {
 }
 
 func (d Declaration) Elements() []string {
-	return []string{grammar.Name, grammar.Arguments, grammar.Returns, grammar.Executable}
+	return []string{elements.Name, elements.Arguments, elements.Returns, elements.Executable}
 }

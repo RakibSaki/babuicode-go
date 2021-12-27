@@ -1,7 +1,7 @@
 package variable
 
 import (
-	"babuicode/grammar"
+	"babuicode/elements"
 )
 
 type Declaration struct {
@@ -15,9 +15,9 @@ type Assignment struct {
 }
 
 func (d Declaration) Elements() []string {
-	return []string{grammar.Name, grammar.Type, grammar.Value}
+	return []string{elements.Name, elements.Type, elements.Value}
 }
 
 func (a Assignment) Elements() []string {
-	return []string{grammar.Name, grammar.Value}
+	return []string{elements.Name, elements.Value}
 }
