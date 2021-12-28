@@ -21,14 +21,11 @@ func New(babuiCode, elements, compiledCode []string) (*Rule, error) {
 	if err != nil {
 		return &Rule{}, err
 	}
+	var hasExecutable bool
 	for _, element := range elements {
 		if element == elementspkg.Executable {
-			return &Rule{
-				Elements:      elements,
-				BabuiCode:     babuiCode,
-				CompiledCode:  compiledCode,
-				HasExecutable: true,
-			}, nil
+			hasExecutable = true
+			break
 		}
 	}
 	literal := ""
@@ -42,11 +39,12 @@ func New(babuiCode, elements, compiledCode []string) (*Rule, error) {
 		return &Rule{}, errors.New(fmt.Sprintf("Error compiling rule literal: %s", err))
 	}
 	return &Rule{
-		Elements:     elements,
-		BabuiCode:    babuiCode,
-		CompiledCode: compiledCode,
-		Literal:      literal,
-		Reg:          reg,
+		Elements:      elements,
+		BabuiCode:     babuiCode,
+		CompiledCode:  compiledCode,
+		HasExecutable: hasExecutable,
+		Literal:       literal,
+		Reg:           reg,
 	}, nil
 }
 

@@ -1,8 +1,9 @@
 package language
 
 import (
-	"babuicode/elements"
 	"babuicode/rule"
+	"errors"
+	"fmt"
 )
 
 const (
@@ -37,14 +38,29 @@ func (l *Language) AddRule(babuicode, elements, compiledcode []string) error {
 	return nil
 }
 
-func (l *Language) Compile(code string) (string, error) {
-	executables := 0
-	rules := make([]string, 0)
-	for _, rule := range l.Rules {
-		if rule.Literal != "" {
-			
-		}
-		rules = append(rules, rule.Literal)
+func (l *Language) Compile(code string, integers ...int) (string, error) {
+	var executables int
+	if len(integers) == 1 {
+		executables = integers[0]
 	}
-	executableLiteral := elements.ExecutableLiteral(executables, rules)
+	finds := make([][]int, 0)
+	charactersFound := make(map[int]*rule.Rule)
+	for _, rule := range l.Rules {
+		for _, find := range rule.Find(code) {
+			finds = append(finds, find)
+			for i := find[0]; i < find[1]; i++ {
+				charactersFound[i] = rule
+			}
+		}
+	}
+	lines := 1
+	characters := 1
+	for i := 0; i < len(code); i++ {
+		if code[i] == '\n' {
+			lines++
+		}
+		return "", errors.New(fmt.Sprintf("Unexpected character %s at line %i, character %i", code[i], lines, characters))
+		characters++
+	}
+
 }

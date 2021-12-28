@@ -1,7 +1,6 @@
 package elements
 
 import (
-	"fmt"
 	"regexp"
 )
 
@@ -27,21 +26,13 @@ var Elements map[string]bool = map[string]bool{
 }
 
 var Literals map[string]string = map[string]string{
-	Number: `[0-9]+(\.[0-9]*)?`,
-	String: `"[^"]*"`,
-	Name:   `(_|[a-z|A-Z])+\w*`,
-	Type:   `string|float|int|bool`,
-	Bool:   `true|false`,
-	Value:  `([0-9]+(\.[0-9]*)?)|("[^"]*")|(true|false)`,
-}
-
-func ExecutableLiteral(executables int, rules []string) string {
-	result := `\t{executables+1}`
-	for _, rule := range rules {
-		result += fmt.Sprintf(`(%s)|`, rule)
-	}
-	result = result[:len(result)-1]
-	return result
+	Number:     `[0-9]+(\.[0-9]*)?`,
+	String:     `"[^"]*"`,
+	Name:       `(_|[a-z|A-Z])+\w*`,
+	Type:       `string|float|int|bool`,
+	Bool:       `true|false`,
+	Value:      `([0-9]+(\.[0-9]*)?)|("[^"]*")|(true|false)`,
+	Executable: `(\t.*\n)+`,
 }
 
 var Regexps map[string]*regexp.Regexp = map[string]*regexp.Regexp{
