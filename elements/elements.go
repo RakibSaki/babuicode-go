@@ -1,6 +1,9 @@
 package elements
 
-import "regexp"
+import (
+	"fmt"
+	"regexp"
+)
 
 const Value string = "value"
 const Number string = "number"
@@ -30,6 +33,15 @@ var Literals map[string]string = map[string]string{
 	Type:   `string|float|int|bool`,
 	Bool:   `true|false`,
 	Value:  `([0-9]+(\.[0-9]*)?)|("[^"]*")|(true|false)`,
+}
+
+func ExecutableLiteral(executables int, rules []string) string {
+	result := `\t{executables+1}`
+	for _, rule := range rules {
+		result += fmt.Sprintf(`(%s)|`, rule)
+	}
+	result = result[:len(result)-1]
+	return result
 }
 
 var Regexps map[string]*regexp.Regexp = map[string]*regexp.Regexp{
