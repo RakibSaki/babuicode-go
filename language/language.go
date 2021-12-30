@@ -4,6 +4,8 @@ import (
 	"babuicode/rule"
 	"errors"
 	"fmt"
+	"regexp"
+	"strconv"
 )
 
 const (
@@ -38,29 +40,58 @@ func (l *Language) AddRule(babuicode, elements, compiledcode []string) error {
 	return nil
 }
 
-func (l *Language) Compile(code string, integers ...int) (string, error) {
-	var executables int
-	if len(integers) == 1 {
-		executables = integers[0]
-	}
+// Compile converts babuicode to compiled code ie, code in base language. It scans for
+// parts of code that could be instances of a rule and then replaces those instances
+// with compiledcode as instructed by the rule.
+func (l *Language) Compile(code string) (string, error) {
 	finds := make([][]int, 0)
-	charactersFound := make(map[int]*rule.Rule)
+	ruleAt := make(map[int]*rule.Rule)
+	// find matches to rules
 	for _, rule := range l.Rules {
 		for _, find := range rule.Find(code) {
 			finds = append(finds, find)
 			for i := find[0]; i < find[1]; i++ {
-				charactersFound[i] = rule
+				ruleAt[i] = rule
 			}
 		}
 	}
 	lines := 1
-	characters := 1
+	characters := 0
 	for i := 0; i < len(code); i++ {
+		characters++
 		if code[i] == '\n' {
 			lines++
 		}
-		return "", errors.New(fmt.Sprintf("Unexpected character %s at line %i, character %i", code[i], lines, characters))
-		characters++
+		if ruleAt[i] == nil {
+			space, _ := regexp.Match(`[[:space:]]`, []byte{code[i]})
+			if space {
+				continue
+			}
+			unexpected := string(code[i])
+			for j := i + 1; ruleAt[j] == nil; j++ {
+				unexpected += string(code[j])
+			}
+			return "", UnexpectedCharacterError(lines, characters, unexpected)
+		}
 	}
 
+}
+
+func UnexpectedCharacterError(line, character int, unexpected string) error {
+	return errors.New(fmt.Sprintf("Unexpected code \"%s\" at line %i, character %i", unexpected, line, character))
+}
+
+func ParseUnexpectedCharacterError(e error) (int, int, error) {
+	err := e.Error()
+	// verify it is an UnexpectedCharacterError
+	errorPattern := `Unexpected code ".*" at line (\d+), character (\d+)`
+	reg, _ := regexp.Compile(errorPattern)
+	right := reg.MatchString(err)
+	if !right {
+		return 0, 0, errors.New("Not a valid UnexpectedCharacterError")
+	}
+	matches := reg.FindStringSubmatch(err)
+	line, _ := strconv.Atoi(matches[1])
+	character, _ := strconv.Atoi(matches[2])
+	return line, character, nil
 }
